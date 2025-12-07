@@ -1,24 +1,25 @@
 <?php
 /**
  * config.php
- * Ready-to-use configuration for Railway PHP + MySQL
- * Works for both Railway deployment and local testing
+ * Railway-ready database configuration using MYSQL_URL
  */
 
-// Get environment variables set by Railway
-$host = getenv("MYSQLHOST") ?: '127.0.0.1';      // fallback for local testing
-$port = getenv("MYSQLPORT") ?: '3306';           // fallback port
-$dbname = getenv("MYSQLDATABASE") ?: 'mydb';    // fallback database name
-$user = getenv("MYSQLUSER") ?: 'root';          // fallback username
-$pass = getenv("MYSQLPASSWORD") ?: '';          // fallback password
+// Get the MySQL connection URL from the environment variable
+$mysql_url = getenv("MYSQL_URL");
+
+if (!$mysql_url) {
+    die("Error: MYSQL_URL environment variable is not set.");
+}
 
 try {
-    // Include port in DSN
-    $conn = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $user, $pass);
+    // Create a PDO connection using the URL
+    $conn = new PDO($mysql_url);
+    
+    // Set PDO to throw exceptions on error
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // Optional: for debug purposes
+    // echo "Database connected successfully!";
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
-
-// Optional: Uncomment for debugging connection
-// echo "Connected to database $dbname at $host:$port successfully.";
